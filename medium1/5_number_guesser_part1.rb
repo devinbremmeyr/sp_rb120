@@ -4,48 +4,68 @@
 class GuessingGame
   MAX_GUESSES = 7
   RANGE = 1..100
-  attr_reader :guesses_remaining
   def initialize
     puts "WELCOME TO NUMBER GUESSER"
   end
 
+  def play
+    reset
+    puts "~~~   LETS PLAY   ~~~"
+    loop do
+      puts
+      puts guesses_remaining
+      user_makes_guess
+      puts guess_response
+      break if @guesses_remaining.zero? || correct_guess?
+    end
+    puts end_game_message
+  end
+
+  private
+
   def reset
-    @magic_number = RANGE.to_a.sample
+    @magic_number = rand(RANGE)
     @guesses_remaining = MAX_GUESSES
   end
 
-  def play
-    puts "~~~   LETS PLAY   ~~~"
-    reset
-    guess = nil
-    loop do
-      puts "You have #{guesses_remaining} guesses remaining."
-      get_guess
-      break if @guess == @magic_number
-      @guesses -= 1
-      puts "Your guess is too #{high_low}."
-      break if @guesses == 0
-    end
-    if guess == @magic_number
-      puts "You won!"
-    else
-      puts "You have no more guesses. You lost!"
-    end
+  def guesses_remaining
+    "You have #{@guesses_remaining} guesses remaining."
   end
 
-  def high_low
-    @magic_number < @guess ? 'high' : 'low'
-  end
-
-  def get_guess
+  def user_makes_guess
     input = nil
     loop do
       print "Enter a number between 1 and 100: "
       input = gets.chomp.to_i
-      break if (1..100).include?(input)
+      break if (RANGE).cover?(input)
       print "Invalid guess. "
     end
     @guess = input
+    @guesses_remaining -= 1
+  end
+
+  def correct_guess?
+    @guess == @magic_number
+  end
+
+  def guess_response
+    if correct_guess?
+      "That's the number!!"
+    else
+      "Your guess is too #{high_low}."
+    end
+  end
+
+  def high_low
+    @magic_number < @guess ? 'HIGH' : 'LOW'
+  end
+
+  def end_game_message
+    if @guess == @magic_number
+      "You won!"
+    else
+      "You have no more guesses. You lost!"
+    end
   end
 end
 
